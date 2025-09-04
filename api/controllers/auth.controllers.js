@@ -6,10 +6,23 @@ import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
+
+  try {
+  // check if user exists in db 
+  // if user exists tell them to login
+
+
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (user) return res.status(401).json({ message: "User Already Exist" });
+
+// otherwise continue the flow
   // HASH PASSWORD
   const hashedPassword = await bcrypt.hash(password, 10);
   // CREATE USER AND STORE IN DB
-  try {
+
     const newuser = await prisma.user.create({
       data: {
         username,
@@ -17,9 +30,12 @@ export const register = async (req, res) => {
         password: hashedPassword,
       },
     });
-    res.status(201).json({ message: "User created successfully" });
-    console.log("🚀 ~ register ~ newuser:", newuser);
-  } catch (err) {
+    res.status(201).json({ 
+        message: "User created successfully", 
+        user: newuser 
+    });
+
+} catch (err) {
     console.log("🚀 ~ register ~ err:", err);
     res.status(500).json({ message: "Failed to create user" });
   }
@@ -58,7 +74,7 @@ export const login = async (req, res) => {
         maxAge: age,
       })
       .status(200)
-      .json({ message: "Login successful" });
+      .json({ message: "Login successful", user });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to login!" });
@@ -66,6 +82,5 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  // db operations
-  res.clearCookie("token").status(200).json({message:"Logout successful"})
+  res.clearCookie("token").status(204).json({message:"Logout successful"})
 };
