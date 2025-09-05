@@ -1,78 +1,3 @@
-// import React, { useState, useEffect } from "react";
-// import { ChevronLeft, ChevronRight } from "lucide-react";
-
-// const Slider: React.FC = () => {
-//   const [currentSlide, setCurrentSlide] = useState(0);
-
-//   const data: string[] = [
-//     "/slider-image2.png",
-//     "/slider-camera.png",
-//     "/slider-image3.png",
-//   ];
-
-//   const prevSlide = () => {
-//     setCurrentSlide((prev) => (prev === 0 ? data.length - 1 : prev - 1));
-//   };
-
-//   const nextSlide = () => {
-//     setCurrentSlide((prev) => (prev === data.length - 1 ? 0 : prev + 1));
-//   };
-
-//   // Auto-slide functionality
-//   useEffect(() => {
-//     const autoSlide = setInterval(() => {
-//       setCurrentSlide((prev) => (prev === data.length - 1 ? 0 : prev + 1));
-//     }, 3000); // Change slide every 3 seconds
-
-//     return () => clearInterval(autoSlide);
-//   }, [data.length]);
-
-//   // Keyboard navigation
-//   useEffect(() => {
-//     const handleKeyPress = (e: KeyboardEvent) => {
-//       if (e.key === "ArrowLeft") {
-//         prevSlide();
-//       } else if (e.key === "ArrowRight") {
-//         nextSlide();
-//       }
-//     };
-
-//     window.addEventListener("keydown", handleKeyPress);
-//     return () => window.removeEventListener("keydown", handleKeyPress);
-//   }, []);
-
-//   return (
-//     <div className="relative w-full  min-h-screen overflow-y-scroll">
-//       {/* Container */}
-//       <div className="w-full">
-//         <img
-//           src={data[currentSlide]}
-//           alt={`slide-${currentSlide}`}
-//           className="w-full object-cover"
-//         />
-//       </div>
-
-//       {/* Navigation Icons */}
-//       <div className="absolute bottom-24 left-0 right-0 flex justify-center gap-3">
-//         <button
-//           onClick={prevSlide}
-//           className="w-12 h-12 border border-gray-400 flex items-center justify-center cursor-pointer bg-white/70 hover:bg-white rounded"
-//         >
-//           <ChevronLeft className="w-6 h-6 text-gray-700" />
-//         </button>
-//         <button
-//           onClick={nextSlide}
-//           className="w-12 h-12 border border-gray-400 flex items-center justify-center cursor-pointer bg-white/70 hover:bg-white rounded"
-//         >
-//           <ChevronRight className="w-6 h-6 text-gray-700" />
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Slider;
-
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -80,7 +5,6 @@ const Slider: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Configurable duration (in milliseconds)
   const SLIDE_DURATION = 4000; // Change this value to adjust auto-slide timing
   const TRANSITION_DURATION = 500; // Animation duration
 

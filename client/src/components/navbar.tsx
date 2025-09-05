@@ -189,7 +189,6 @@
 
 // export default Navbar;
 
-
 "use client";
 import React, { useState } from "react";
 import { Link } from "react-router";
@@ -205,11 +204,11 @@ import {
 } from "lucide-react";
 // import Cart from "../Cart/Cart";
 
-interface RootState {
-  cart: {
-    // products: any[];
-  };
-}
+// interface RootState {
+//   cart: {
+//     products: any[];
+//   };
+// }
 
 const Navbar: React.FC = () => {
   const [open, setOpen] = useState(false);
