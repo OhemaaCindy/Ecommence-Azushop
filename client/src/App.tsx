@@ -2,7 +2,8 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import PageLayout from "./components/page-layout";
 import { Toaster } from "react-hot-toast";
 import HomePage from "./pages/homepage";
-import Checkoutpage from "./pages/checkout-page";
+import Productspage from "./pages/products-page";
+import Poductdetailspage from "./pages/poduct-details-page";
 
 function App() {
   const router = createBrowserRouter([
@@ -11,11 +12,11 @@ function App() {
       element: <PageLayout />,
       children: [
         { index: true, element: <HomePage /> },
-        { path: "checkout", element: <Checkoutpage /> },
+        { path: "products/:id", element: <Productspage /> },
+        { path: "product/:id", element: <Poductdetailspage /> },
         // { path: "register", element: <SignUpPage /> },
         // { path: "otp-verification", element: <OtpVerificationPage /> },
         // { path: "forgot-password", element: <ForgotPassword /> },
-        // { path: "reset-password/:id", element: <ResetPassword /> },
         // { path: "tracks", element: <TracksPage /> },
         // { path: "track/:id", element: <TrackDetailsPage /> },
 
