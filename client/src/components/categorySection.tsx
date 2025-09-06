@@ -133,7 +133,7 @@ const ShopByCategories: React.FC = () => {
   const visibleCategories = getVisibleCategories();
 
   return (
-    <div className="w-9xl ml-8 md:ml-16 lg:ml-24  px-4 py-8">
+    <div className="ml-10 mr-10  px-4 py-8">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <button

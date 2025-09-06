@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Slider: React.FC = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(1); // Start at 1 because of the cloned last slide at the start
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const SLIDE_DURATION = 4000; // Change this value to adjust auto-slide timing
-  const TRANSITION_DURATION = 500; // Animation duration
+  const SLIDE_DURATION = 4000; // Auto-slide time
+  const TRANSITION_DURATION = 500; // Animation time
 
   const slides = [
     {
-      image: "/slider-image2.png",
-      title: "Next-Gen Mobility",
-      subtitle:
-        "Power, performance and style - experience the future of smartphones today.",
+      image:
+        "https://images.pexels.com/photos/33259412/pexels-photo-33259412.jpeg",
+      title: "Glow & Bold",
+      subtitle: "Curated looks for the fearless generation.",
       buttonText: "Shop Now",
     },
     {
@@ -24,117 +25,100 @@ const Slider: React.FC = () => {
       buttonText: "Shop collection",
     },
     {
-      image: "/slider-image3.png",
+      image:
+        "https://images.pexels.com/photos/27815884/pexels-photo-27815884.jpeg",
       title: "Power meets portability",
       subtitle:
-        "Unmatched performance and sleek design - built for work and play.",
+        "Designed for the Bold, Worn by You. Because Ordinary Isn’t Your Style",
       buttonText: "Shop collection",
     },
+  ];
+
+  // Clone first & last for smooth looping
+  const extendedSlides = [
+    slides[slides.length - 1], // last clone at the beginning
+    ...slides,
+    slides[0], // first clone at the end
   ];
 
   const prevSlide = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-    setTimeout(() => setIsTransitioning(false), TRANSITION_DURATION);
+    setCurrentSlide((prev) => prev - 1);
   };
 
   const nextSlide = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-    setTimeout(() => setIsTransitioning(false), TRANSITION_DURATION);
+    setCurrentSlide((prev) => prev + 1);
   };
 
   const goToSlide = (index: number) => {
-    if (isTransitioning || index === currentSlide) return;
+    if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentSlide(index);
-    setTimeout(() => setIsTransitioning(false), TRANSITION_DURATION);
+    setCurrentSlide(index + 1); // offset because of clone
   };
 
-  // Auto-slide functionality
+  // Handle transition end (jump from clones back to real slides instantly)
+  const handleTransitionEnd = () => {
+    setIsTransitioning(false);
+    if (currentSlide === 0) {
+      setCurrentSlide(slides.length); // Jump to last real slide
+      if (containerRef.current) containerRef.current.style.transition = "none";
+    } else if (currentSlide === slides.length + 1) {
+      setCurrentSlide(1); // Jump to first real slide
+      if (containerRef.current) containerRef.current.style.transition = "none";
+    }
+  };
+
+  // Auto-slide
   useEffect(() => {
     const autoSlide = setInterval(() => {
-      if (!isTransitioning) {
-        setIsTransitioning(true);
-        setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-        setTimeout(() => setIsTransitioning(false), TRANSITION_DURATION);
-      }
+      nextSlide();
     }, SLIDE_DURATION);
-
     return () => clearInterval(autoSlide);
-  }, [slides.length, isTransitioning, SLIDE_DURATION, TRANSITION_DURATION]);
+  });
 
-  // Keyboard navigation
+  // Reapply transition after resetting position
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        prevSlide();
-      } else if (e.key === "ArrowRight") {
-        nextSlide();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [isTransitioning]);
+    if (containerRef.current) {
+      requestAnimationFrame(() => {
+        containerRef.current!.style.transition = `transform ${TRANSITION_DURATION}ms ease-in-out`;
+      });
+    }
+  }, [currentSlide]);
 
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
       {/* Slides Container */}
       <div
-        className="flex transition-transform duration-500 ease-in-out h-screen"
+        ref={containerRef}
+        className="flex h-screen"
         style={{
           transform: `translateX(-${currentSlide * 100}%)`,
-          transitionDuration: `${TRANSITION_DURATION}ms`,
+          transition: isTransitioning
+            ? `transform ${TRANSITION_DURATION}ms ease-in-out`
+            : "none",
         }}
+        onTransitionEnd={handleTransitionEnd}
       >
-        {slides.map((slide, index) => (
+        {extendedSlides.map((slide, index) => (
           <div key={index} className="relative w-full h-full flex-shrink-0">
             <img
               src={slide.image}
               alt={`slide-${index}`}
               className="w-full h-full object-cover"
             />
-
-            {/* Text Overlay */}
-            <div className="absolute inset-0 flex items-center justify-start">
+            {/* Overlay Text */}
+            <div className="absolute inset-0 flex items-center justify-start bg-black/30">
               <div className="ml-8 md:ml-16 lg:ml-24 max-w-lg">
-                <h1
-                  className={`text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight transition-all duration-700 ${
-                    index === currentSlide
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 translate-y-8"
-                  }`}
-                  style={{
-                    transitionDelay: index === currentSlide ? "200ms" : "0ms",
-                  }}
-                >
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
                   {slide.title}
                 </h1>
-                <p
-                  className={`text-lg md:text-xl text-white/90 mb-8 transition-all duration-700 ${
-                    index === currentSlide
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 translate-y-8"
-                  }`}
-                  style={{
-                    transitionDelay: index === currentSlide ? "400ms" : "0ms",
-                  }}
-                >
+                <p className="text-lg md:text-xl text-white/90 mb-8">
                   {slide.subtitle}
                 </p>
-                <button
-                  className={`bg-white text-black px-6 py-3 rounded-md hover:bg-gray-100 transition-all duration-300 font-medium flex items-center gap-2 ${
-                    index === currentSlide
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 translate-y-8"
-                  }`}
-                  style={{
-                    transitionDelay: index === currentSlide ? "600ms" : "0ms",
-                  }}
-                >
+                <button className="bg-white text-black px-6 py-3 rounded-md hover:bg-gray-100 transition-all duration-300 font-medium flex items-center gap-2">
                   {slide.buttonText}
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -144,48 +128,35 @@ const Slider: React.FC = () => {
         ))}
       </div>
 
-      {/* Navigation Icons */}
+      {/* Navigation */}
       <div className="absolute bottom-24 left-0 right-0 flex justify-center gap-3">
         <button
           onClick={prevSlide}
-          disabled={isTransitioning}
-          className="w-12 h-12 border border-gray-400 flex items-center justify-center cursor-pointer bg-white/70 hover:bg-white rounded transition-all duration-200 disabled:opacity-50"
+          className="w-12 h-12 border border-gray-400 flex items-center justify-center cursor-pointer bg-white/70 hover:bg-white rounded"
         >
           <ChevronLeft className="w-6 h-6 text-gray-700" />
         </button>
         <button
           onClick={nextSlide}
-          disabled={isTransitioning}
-          className="w-12 h-12 border border-gray-400 flex items-center justify-center cursor-pointer bg-white/70 hover:bg-white rounded transition-all duration-200 disabled:opacity-50"
+          className="w-12 h-12 border border-gray-400 flex items-center justify-center cursor-pointer bg-white/70 hover:bg-white rounded"
         >
           <ChevronRight className="w-6 h-6 text-gray-700" />
         </button>
       </div>
 
-      {/* Slide Indicators */}
+      {/* Indicators */}
       <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide
+              index + 1 === currentSlide
                 ? "bg-white scale-110"
                 : "bg-white/50 hover:bg-white/70"
             }`}
           />
         ))}
-      </div>
-
-      {/* Progress Bar */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-black/20">
-        <div
-          className="h-full bg-white transition-all ease-linear"
-          style={{
-            width: `${((currentSlide + 1) / slides.length) * 100}%`,
-            transitionDuration: `${TRANSITION_DURATION}ms`,
-          }}
-        />
       </div>
     </div>
   );

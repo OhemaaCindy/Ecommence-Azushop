@@ -1,4 +1,5 @@
 import ShopByCategories from "./categorySection";
+import TrendingProducts from "./trending-products";
 
 const FeaturedProducts = () => {
   return (
@@ -17,6 +18,7 @@ const FeaturedProducts = () => {
           designed to elevate your lifestyle.
         </p>
       </section>
+      <TrendingProducts />
     </>
   );
 };
